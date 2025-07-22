@@ -68,7 +68,7 @@ def test_cartesian_planner(use_trapezoidal_scaling):
     assert q_vec.shape[1] == len(t_vec)
 
 
-def test_cartesian_planner_failure():
+def test_cartesian_planner_failure() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
     data = model.createData()

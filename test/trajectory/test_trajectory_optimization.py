@@ -12,7 +12,7 @@ from pyroboplan.trajectory.trajectory_optimization import (
 np.random.seed(1234)
 
 
-def test_bad_traj_opt_options():
+def test_bad_traj_opt_options() -> None:
     # Insufficient waypoints
     with pytest.raises(ValueError):
         CubicTrajectoryOptimizationOptions(num_waypoints=1)
@@ -22,7 +22,7 @@ def test_bad_traj_opt_options():
         CubicTrajectoryOptimizationOptions(min_segment_time=-0.1)
 
 
-def test_start_goal_traj_opt():
+def test_start_goal_traj_opt() -> None:
     model, collision_model, _ = load_models()
 
     # Define the start and goal configurations
@@ -70,7 +70,7 @@ def test_start_goal_traj_opt():
         assert np.all(qddd <= options.max_jerk)
 
 
-def test_full_path_traj_opt():
+def test_full_path_traj_opt() -> None:
     model, collision_model, _ = load_models()
 
     # Define a multi-configuration path
@@ -124,7 +124,7 @@ def test_full_path_traj_opt():
         assert np.all(qddd <= options.max_jerk)
 
 
-def test_traj_opt_unreachable_goal():
+def test_traj_opt_unreachable_goal() -> None:
     model, collision_model, _ = load_models()
 
     # Define the start and goal configurations
@@ -137,7 +137,7 @@ def test_traj_opt_unreachable_goal():
     assert planner.plan([q_start, q_goal]) is None
 
 
-def test_traj_opt_bad_limits():
+def test_traj_opt_bad_limits() -> None:
     model, collision_model, _ = load_models()
 
     # Define a multi-configuration path
@@ -158,7 +158,7 @@ def test_traj_opt_bad_limits():
         planner.plan(q_path)
 
 
-def test_traj_opt_empty_path():
+def test_traj_opt_empty_path() -> None:
     model, collision_model, _ = load_models()
 
     # Define an empty path
@@ -173,7 +173,7 @@ def test_traj_opt_empty_path():
         assert planner.plan(q_path) is None
 
 
-def test_traj_opt_bad_num_waypoints():
+def test_traj_opt_bad_num_waypoints() -> None:
     model, collision_model, _ = load_models()
 
     # Define a multi-configuration path
@@ -193,7 +193,7 @@ def test_traj_opt_bad_num_waypoints():
         planner.plan(q_path)
 
 
-def test_traj_opt_collision_avoidance():
+def test_traj_opt_collision_avoidance() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
 

@@ -28,13 +28,13 @@ from pyroboplan.models.panda import (
 np.random.seed(1234)
 
 
-def test_configuration_distance():
+def test_configuration_distance() -> None:
     q_start = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
     q_end = np.array([0.3, 0.0, -0.4, 0.0, 0.0])
     assert configuration_distance(q_start, q_end) == pytest.approx(0.5)
 
 
-def test_get_path_length():
+def test_get_path_length() -> None:
     q_path = [
         np.array([0.0, 0.0, 0.0, 0.0, 0.0]),
         np.array([0.3, 0.0, -0.4, 0.0, 0.0]),
@@ -44,7 +44,7 @@ def test_get_path_length():
     assert get_path_length(q_path) == pytest.approx(11.5)
 
 
-def test_get_random_state():
+def test_get_random_state() -> None:
     model, _, _ = load_models()
     for _ in range(10):
         state = get_random_state(model)
@@ -52,7 +52,7 @@ def test_get_random_state():
         assert np.all(state <= model.upperPositionLimit)
 
 
-def test_get_random_state_with_scalar_padding():
+def test_get_random_state_with_scalar_padding() -> None:
     model, _, _ = load_models()
     padding = 0.01
     for _ in range(10):
@@ -61,7 +61,7 @@ def test_get_random_state_with_scalar_padding():
         assert np.all(state <= model.upperPositionLimit - padding)
 
 
-def test_get_random_state_with_vector_padding():
+def test_get_random_state_with_vector_padding() -> None:
     model, _, _ = load_models()
     padding = [0.1, 0.2, 0.1, 0.2, 0.1, 0.2, 0.1, 0.01, 0.01]
     for _ in range(10):
@@ -70,13 +70,13 @@ def test_get_random_state_with_vector_padding():
         assert np.all(state <= model.upperPositionLimit - padding)
 
 
-def test_get_random_transform():
+def test_get_random_transform() -> None:
     model, _, _ = load_models()
     tform = get_random_transform(model, "panda_hand")
     assert isinstance(tform, pinocchio.SE3)
 
 
-def test_get_random_collision_free_state():
+def test_get_random_collision_free_state() -> None:
     model, collision_model, visual_model = load_models()
     add_self_collisions(model, collision_model)
     add_object_collisions(model, collision_model, visual_model)
@@ -86,7 +86,7 @@ def test_get_random_collision_free_state():
     assert np.all(state <= model.upperPositionLimit)
 
 
-def test_get_random_collision_free_transform():
+def test_get_random_collision_free_transform() -> None:
     model, collision_model, visual_model = load_models()
     add_self_collisions(model, collision_model)
     add_object_collisions(model, collision_model, visual_model)
@@ -95,7 +95,7 @@ def test_get_random_collision_free_transform():
     assert isinstance(tform, pinocchio.SE3)
 
 
-def test_within_limits():
+def test_within_limits() -> None:
     model, _, _ = load_models()
 
     assert check_within_limits(model, get_random_state(model))
@@ -103,7 +103,7 @@ def test_within_limits():
     assert not check_within_limits(model, model.lowerPositionLimit - 0.2)
 
 
-def test_extract_cartesian_pose():
+def test_extract_cartesian_pose() -> None:
     model, _, _ = load_models()
 
     q = get_random_state(model)
@@ -112,7 +112,7 @@ def test_extract_cartesian_pose():
     assert isinstance(tform, pinocchio.SE3)
 
 
-def test_extract_cartesian_poses():
+def test_extract_cartesian_poses() -> None:
     model, _, _ = load_models()
 
     q_vec = [get_random_state(model) for _ in range(5)]
@@ -123,7 +123,7 @@ def test_extract_cartesian_poses():
         assert isinstance(tform, pinocchio.SE3)
 
 
-def test_check_collisions_at_state():
+def test_check_collisions_at_state() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
 
@@ -159,7 +159,7 @@ def test_check_collisions_at_state():
     assert not check_collisions_at_state(model, collision_model, free_state)
 
 
-def test_check_collisions_along_path():
+def test_check_collisions_along_path() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
 
@@ -213,7 +213,7 @@ def test_check_collisions_along_path():
     )
 
 
-def test_get_collision_geometry_ids():
+def test_get_collision_geometry_ids() -> None:
     model, collision_model, _ = load_models()
 
     # This is directly the name of a collision geometry.
@@ -232,7 +232,7 @@ def test_get_collision_geometry_ids():
     assert ids == []
 
 
-def test_set_collisions():
+def test_set_collisions() -> None:
     model, collision_model, _ = load_models()
     assert len(collision_model.collisionPairs) == 0
 

@@ -10,7 +10,7 @@ from pyroboplan.trajectory.polynomial import (
 ##########################
 # CUBIC TRAJECTORY TESTS #
 ##########################
-def test_single_dof_cubic_trajectory():
+def test_single_dof_cubic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = np.array([0.0, -0.1, 0.1, 0.0])
@@ -26,7 +26,7 @@ def test_single_dof_cubic_trajectory():
         assert len(coeffs) == 4  # 4 coefficients for cubics
 
 
-def test_multi_dof_cubic_trajectory():
+def test_multi_dof_cubic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array(
         [
@@ -53,7 +53,7 @@ def test_multi_dof_cubic_trajectory():
             assert len(coeffs) == 4  # 4 coefficients for cubics
 
 
-def test_evaluate_cubic_trajectory_bad_time_values():
+def test_evaluate_cubic_trajectory_bad_time_values() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = 0.0
@@ -66,7 +66,7 @@ def test_evaluate_cubic_trajectory_bad_time_values():
         assert traj.evaluate(42.0) is None
 
 
-def test_evaluate_single_dof_cubic_trajectory():
+def test_evaluate_single_dof_cubic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = 0.0
@@ -85,7 +85,7 @@ def test_evaluate_single_dof_cubic_trajectory():
     assert qddd_eval == pytest.approx(0.9777777)
 
 
-def test_evaluate_multi_dof_cubic_trajectory():
+def test_evaluate_multi_dof_cubic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array(
         [
@@ -114,7 +114,7 @@ def test_evaluate_multi_dof_cubic_trajectory():
     assert qddd_eval == pytest.approx([0.97777777, -0.88888888])
 
 
-def test_generate_single_dof_cubic_trajectory():
+def test_generate_single_dof_cubic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = 0.0
@@ -128,7 +128,7 @@ def test_generate_single_dof_cubic_trajectory():
     assert qddd.shape == (1, num_pts)
 
 
-def test_generate_multi_dof_cubic_trajectory():
+def test_generate_multi_dof_cubic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array(
         [
@@ -155,7 +155,7 @@ def test_generate_multi_dof_cubic_trajectory():
 ############################
 # QUINTIC TRAJECTORY TESTS #
 ############################
-def test_single_dof_quintic_trajectory():
+def test_single_dof_quintic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = np.array([0.0, -0.1, 0.1, 0.0])
@@ -172,7 +172,7 @@ def test_single_dof_quintic_trajectory():
         assert len(coeffs) == 6  # 6 coefficients for quintics
 
 
-def test_multi_dof_quintic_trajectory():
+def test_multi_dof_quintic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array(
         [
@@ -200,7 +200,7 @@ def test_multi_dof_quintic_trajectory():
             assert len(coeffs) == 6  # 6 coefficients for quintics
 
 
-def test_evaluate_quintic_trajectory_bad_time_values():
+def test_evaluate_quintic_trajectory_bad_time_values() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = 0.0
@@ -214,7 +214,7 @@ def test_evaluate_quintic_trajectory_bad_time_values():
         assert traj.evaluate(42.0) is None
 
 
-def test_evaluate_single_dof_quintic_trajectory():
+def test_evaluate_single_dof_quintic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = 0.0
@@ -234,7 +234,7 @@ def test_evaluate_single_dof_quintic_trajectory():
     assert qddd_eval == pytest.approx(2.444444444)
 
 
-def test_evaluate_multi_dof_quintic_trajectory():
+def test_evaluate_multi_dof_quintic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array(
         [
@@ -269,7 +269,7 @@ def test_evaluate_multi_dof_quintic_trajectory():
     assert qddd_eval == pytest.approx([2.4444444, -2.2222222])
 
 
-def test_generate_single_dof_quintic_trajectory():
+def test_generate_single_dof_quintic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = 0.0
@@ -284,7 +284,7 @@ def test_generate_single_dof_quintic_trajectory():
     assert qddd.shape == (1, num_pts)
 
 
-def test_generate_multi_dof_quintic_trajectory():
+def test_generate_multi_dof_quintic_trajectory() -> None:
     t = np.array([0.0, 3.0, 6.0, 9.0])
     q = np.array([0.0, 1.0, -1.2, 0.25])
     qd = np.array(

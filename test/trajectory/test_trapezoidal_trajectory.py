@@ -4,7 +4,7 @@ import pytest
 from pyroboplan.trajectory.trapezoidal_velocity import TrapezoidalVelocityTrajectory
 
 
-def test_single_dof_trajectory():
+def test_single_dof_trajectory() -> None:
     q = np.array([1.0, 2.0, 2.0, 2.4, 5.0])
     qd_max = 1.0
     qdd_max = 1.0
@@ -20,7 +20,7 @@ def test_single_dof_trajectory():
     assert not np.any(np.abs(traj_0.accelerations) > qdd_max)
 
 
-def test_multi_dof_trajectory_scalar_limits():
+def test_multi_dof_trajectory_scalar_limits() -> None:
     q = np.array(
         [
             [1.0, 2.0, 2.0, 2.4, 5.0],
@@ -39,7 +39,7 @@ def test_multi_dof_trajectory_scalar_limits():
         assert not np.any(np.abs(sub_traj.accelerations) > qdd_max)
 
 
-def test_multi_dof_trajectory_vector_limits():
+def test_multi_dof_trajectory_vector_limits() -> None:
     q = np.array(
         [
             [1.0, 2.0, 2.0, 2.4, 5.0],
@@ -58,7 +58,7 @@ def test_multi_dof_trajectory_vector_limits():
         assert not np.any(np.abs(sub_traj.accelerations) > qdd_max[dim])
 
 
-def test_evaluate_bad_time_values():
+def test_evaluate_bad_time_values() -> None:
     q = np.array([1.0, 2.0, 2.0, 2.4, 5.0])
     qd_max = 1.5
     qdd_max = 1.0
@@ -71,7 +71,7 @@ def test_evaluate_bad_time_values():
         assert traj.evaluate(100.0) is None
 
 
-def test_evaluate_single_dof():
+def test_evaluate_single_dof() -> None:
     q = np.array([1.0, 2.0, 2.0, 2.4, 5.0])
     qd_max = 1.5
     qdd_max = 1.0
@@ -88,7 +88,7 @@ def test_evaluate_single_dof():
     assert qdd == pytest.approx(1.0)
 
 
-def test_evaluate_multi_dof():
+def test_evaluate_multi_dof() -> None:
     q = np.array(
         [
             [1.0, 2.0, 2.0, 2.4, 5.0],
@@ -119,7 +119,7 @@ def test_evaluate_multi_dof():
     assert qdd[2] == pytest.approx(1.0)
 
 
-def test_generate_single_dof():
+def test_generate_single_dof() -> None:
     q = np.array([1.0, 2.0, 2.0, 2.4, 5.0])
     qd_max = 1.5
     qdd_max = 1.0
@@ -132,7 +132,7 @@ def test_generate_single_dof():
     assert qdd.shape == (1, num_pts)
 
 
-def test_generate_multi_dof():
+def test_generate_multi_dof() -> None:
     q = np.array(
         [
             [1.0, 2.0, 2.0, 2.4, 5.0],

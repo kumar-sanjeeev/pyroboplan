@@ -19,19 +19,19 @@ def construct_roadmap_test(options):
     return planner
 
 
-def test_construct_roadmap():
+def test_construct_roadmap() -> None:
     # Initialize the roadmap with a small number of nodes
     options = PRMPlannerOptions(max_construction_nodes=100)
     construct_roadmap_test(options)
 
 
-def test_construct_roadmap_prm_star():
+def test_construct_roadmap_prm_star() -> None:
     # Initialize the roadmap using PRM*
     options = PRMPlannerOptions(prm_star=True, max_construction_nodes=100)
     construct_roadmap_test(options)
 
 
-def test_plan_trivial_prm():
+def test_plan_trivial_prm() -> None:
     model, collision_model, _ = load_models()
     q_start = np.array([0.0, 0.0])
     q_goal = q_start + 0.01
@@ -47,7 +47,7 @@ def test_plan_trivial_prm():
     assert np.all(path[1] == q_goal)
 
 
-def test_prm():
+def test_prm() -> None:
     model, collision_model, _ = load_models()
     q_start = np.array([0.0, 0.0])
     q_goal = np.array([0.5, 0.5])

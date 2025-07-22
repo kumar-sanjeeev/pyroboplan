@@ -9,7 +9,7 @@ from pyroboplan.models.panda import (
 from pyroboplan.planning.rrt import RRTPlanner, RRTPlannerOptions
 
 
-def test_plan_trivial_rrt():
+def test_plan_trivial_rrt() -> None:
     model, collision_model, _ = load_models()
 
     # Initial joint states
@@ -26,7 +26,7 @@ def test_plan_trivial_rrt():
     assert np.all(path[1] == q_goal)
 
 
-def test_plan_vanilla_rrt():
+def test_plan_vanilla_rrt() -> None:
     model, collision_model, visual_model = load_models()
     add_self_collisions(model, collision_model)
     add_object_collisions(model, collision_model, visual_model)
@@ -51,7 +51,7 @@ def test_plan_vanilla_rrt():
     assert len(planner.goal_tree.edges) == 0
 
 
-def test_plan_rrt_connect():
+def test_plan_rrt_connect() -> None:
     model, collision_model, visual_model = load_models()
     add_self_collisions(model, collision_model)
     add_object_collisions(model, collision_model, visual_model)
@@ -82,7 +82,7 @@ def test_plan_rrt_connect():
     assert len(planner.goal_tree.edges) >= 1
 
 
-def test_plan_rrt_star():
+def test_plan_rrt_star() -> None:
     model, collision_model, visual_model = load_models()
     add_self_collisions(model, collision_model)
     add_object_collisions(model, collision_model, visual_model)

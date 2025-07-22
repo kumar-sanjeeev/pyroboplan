@@ -6,7 +6,7 @@ import tempfile
 from pyroboplan.planning.graph import Node, Edge, Graph
 
 
-def test_create_node():
+def test_create_node() -> None:
     node = Node(np.array([1.0, 2.0, 3.0]))
 
     assert np.all(node.q == np.array([1.0, 2.0, 3.0]))
@@ -15,7 +15,7 @@ def test_create_node():
     assert len(node.neighbors) == 0
 
 
-def test_create_node_nondefault_args():
+def test_create_node_nondefault_args() -> None:
     parent_node = Node([1.0, 2.0, 3.0])
     node = Node([4.0, 5.0, 6.0], parent=parent_node, cost=42.0)
 
@@ -26,7 +26,7 @@ def test_create_node_nondefault_args():
     assert len(node.neighbors) == 0
 
 
-def test_create_edge():
+def test_create_edge() -> None:
     nodeA = Node([1.0, 2.0, 3.0])
     nodeB = Node([4.0, 5.0, 6.0])
     edge = Edge(nodeA, nodeB)
@@ -36,7 +36,7 @@ def test_create_edge():
     assert edge.cost == 0.0
 
 
-def test_node_equalities():
+def test_node_equalities() -> None:
     nodeA = Node([1.0, 1.0], 1.0)
     nodeB = Node([1.0, 1.0], 1.0)
     nodeC = Node([2.0, 2.0], 2.0)
@@ -44,7 +44,7 @@ def test_node_equalities():
     assert nodeA != nodeC
 
 
-def test_create_edge_nondefault_args():
+def test_create_edge_nondefault_args() -> None:
     nodeA = Node([1.0, 2.0, 3.0])
     nodeB = Node([4.0, 5.0, 6.0])
     edge = Edge(nodeA, nodeB, cost=21.0)
@@ -54,13 +54,13 @@ def test_create_edge_nondefault_args():
     assert edge.cost == 21.0
 
 
-def test_create_empty_graph():
+def test_create_empty_graph() -> None:
     graph = Graph()
     assert len(graph.nodes) == 0
     assert len(graph.edges) == 0
 
 
-def test_add_nodes():
+def test_add_nodes() -> None:
     nodeA = Node([1.0, 2.0, 3.0])
     nodeB = Node([4.0, 5.0, 6.0])
     graph = Graph()
@@ -83,7 +83,7 @@ def test_add_nodes():
     assert len(graph.edges) == 0
 
 
-def test_remove_nodes():
+def test_remove_nodes() -> None:
     nodeA = Node([1.0, 2.0, 3.0])
     nodeB = Node([4.0, 5.0, 6.0])
     graph = Graph()
@@ -103,7 +103,7 @@ def test_remove_nodes():
     assert nodeB in graph.nodes
 
 
-def test_add_edges():
+def test_add_edges() -> None:
     nodeA = Node([1.0, 2.0, 3.0])
     nodeB = Node([4.0, 5.0, 6.0])
     nodeC = Node([7.0, 8.0, 9.0])
@@ -129,7 +129,7 @@ def test_add_edges():
     assert edgeAC.cost == pytest.approx(np.linalg.norm([6.0, 6.0, 6.0]))
 
 
-def test_remove_edges():
+def test_remove_edges() -> None:
     nodeA = Node([1.0, 2.0, 3.0])
     nodeB = Node([4.0, 5.0, 6.0])
     graph = Graph()
@@ -153,7 +153,7 @@ def test_remove_edges():
     assert len(graph.edges) == 0
 
 
-def test_get_nearest_node():
+def test_get_nearest_node() -> None:
     nodeA = Node([1.0, 2.0, 3.0])
     nodeB = Node([4.0, 5.0, 6.0])
 
@@ -165,13 +165,13 @@ def test_get_nearest_node():
     assert nearest_node == nodeB
 
 
-def test_get_nearest_node_empty_graph():
+def test_get_nearest_node_empty_graph() -> None:
     graph = Graph()
     nearest_node = graph.get_nearest_node([1.0, 2.0, 3.0])
     assert nearest_node is None
 
 
-def test_get_nearest_neighbors():
+def test_get_nearest_neighbors() -> None:
     graph = Graph()
     neighbors = graph.get_nearest_neighbors([1.0], radius=1.0)
 
@@ -193,7 +193,7 @@ def test_get_nearest_neighbors():
     assert neighbors[1] == (nodeC, 2.0)
 
 
-def test_str_and_parse():
+def test_str_and_parse() -> None:
     nodeA = Node([1.0, 2.0, 3.0], cost=1.0)
     nodeB = Node([4.0, 5.0, 6.0], cost=1.0)
     edgeAB = Edge(nodeA, nodeB)
@@ -211,7 +211,7 @@ def test_str_and_parse():
     assert nodeB == chk_edge.nodeB
 
 
-def test_save_and_load():
+def test_save_and_load() -> None:
     nodeA = Node([1.0, 1.0], cost=1.0)
     nodeB = Node([1.0, 2.0], cost=1.0)
     g = Graph()

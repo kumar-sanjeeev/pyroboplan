@@ -12,7 +12,7 @@ from pyroboplan.models.panda import load_models, add_self_collisions
 np.random.seed(1234)
 
 
-def test_ik_solve_trivial_ik():
+def test_ik_solve_trivial_ik() -> None:
     model, _, _ = load_models()
     data = model.createData()
     target_frame = "panda_hand"
@@ -39,7 +39,7 @@ def test_ik_solve_trivial_ik():
     np.testing.assert_almost_equal(q, q_sol, decimal=6)
 
 
-def test_ik_solve_ik():
+def test_ik_solve_ik() -> None:
     model, _, _ = load_models()
     data = model.createData()
     target_frame = "panda_hand"
@@ -76,7 +76,7 @@ def test_ik_solve_ik():
     np.testing.assert_almost_equal(np.zeros(3), error.translation, decimal=3)
 
 
-def test_ik_solve_impossible_ik():
+def test_ik_solve_impossible_ik() -> None:
     model, _, _ = load_models()
     target_frame = "panda_hand"
 
@@ -98,7 +98,7 @@ def test_ik_solve_impossible_ik():
     assert q_sol is None, "Solution should be impossible!"
 
 
-def test_ik_in_collision():
+def test_ik_in_collision() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
     target_frame = "panda_hand"
@@ -134,7 +134,7 @@ def test_ik_in_collision():
     assert q_sol is None, "Solution should be in self-collision!"
 
 
-def test_ik_with_nullspace_components():
+def test_ik_with_nullspace_components() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
     data = model.createData()
@@ -183,7 +183,7 @@ def test_ik_with_nullspace_components():
     np.testing.assert_almost_equal(np.zeros(3), error.translation, decimal=3)
 
 
-def test_ik_solve_bad_joint_weights():
+def test_ik_solve_bad_joint_weights() -> None:
     model, _, _ = load_models()
     target_frame = "panda_hand"
 
@@ -232,7 +232,7 @@ def test_ik_solve_bad_joint_weights():
     assert exc_info.value.args[0] == "All joint weights must be strictly positive."
 
 
-def test_ik_solve_ik_joint_weights():
+def test_ik_solve_ik_joint_weights() -> None:
     model, _, _ = load_models()
     data = model.createData()
     target_frame = "panda_hand"

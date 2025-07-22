@@ -9,7 +9,7 @@ from pyroboplan.planning.utils import (
 )
 
 
-def test_extend_robot_state():
+def test_extend_robot_state() -> None:
     q_parent = np.array([0.0, 0.0])
     q_sample = np.array([2.0, 0.0])
     max_connection_distance = 1.0
@@ -23,7 +23,7 @@ def test_extend_robot_state():
     assert np.array_equal(q_extend, np.array([1.0, 0.0]))
 
 
-def test_discretize_joint_space_path():
+def test_discretize_joint_space_path() -> None:
     q_start = np.array([0.0, 0.0])
     q_end = np.array([2.0, 0.0])
     max_angle_distance = 1.0
@@ -43,7 +43,7 @@ def test_discretize_joint_space_path():
     assert np.array_equal(path, expected_path)
 
 
-def test_retrace_path():
+def test_retrace_path() -> None:
     nodeA = Node([1])
     nodeB = Node([2])
     nodeC = Node([3])
@@ -70,7 +70,7 @@ class DummyModel:
         self.upperPositionLimit = upper_limit
 
 
-def test_discretized_joint_space_simple():
+def test_discretized_joint_space_simple() -> None:
     # Discretize 1-DOF from 0 to 3 at step size 1.0.
     model = DummyModel(np.array([0]), np.array([3]))
     generator = discretized_joint_space_generator(model, 1, False)
@@ -82,7 +82,7 @@ def test_discretized_joint_space_simple():
     assert np.array_equal(points, points_check)
 
 
-def test_discretized_joint_space_random():
+def test_discretized_joint_space_random() -> None:
     model = DummyModel(np.array([0]), np.array([1]))
     generator = discretized_joint_space_generator(model, 1, True)
 

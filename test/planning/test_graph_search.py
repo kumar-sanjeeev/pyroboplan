@@ -34,7 +34,7 @@ def construct_square_graph(n):
     return graph
 
 
-def test_dfs():
+def test_dfs() -> None:
     g = construct_square_graph(5)
 
     start_pose = Node([1, 1])
@@ -49,7 +49,7 @@ def test_dfs():
     assert len(path) == 9
 
 
-def test_astar():
+def test_astar() -> None:
     g = construct_square_graph(5)
 
     start_pose = Node([1, 1])

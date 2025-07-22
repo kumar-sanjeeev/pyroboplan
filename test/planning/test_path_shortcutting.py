@@ -10,7 +10,7 @@ from pyroboplan.planning.path_shortcutting import (
 )
 
 
-def test_get_normalized_path_scaling():
+def test_get_normalized_path_scaling() -> None:
     # Trivial empty path case
     assert get_normalized_path_scaling([]) == []
 
@@ -29,7 +29,7 @@ def test_get_normalized_path_scaling():
     assert scaling == pytest.approx([0.0, 0.25, 0.75, 1.0])
 
 
-def test_get_configuration_from_normalized_path_scaling():
+def test_get_configuration_from_normalized_path_scaling() -> None:
     path = [
         np.array([0.0, 0.0, 0.0]),
         np.array([1.0, 0.0, 0.0]),
@@ -62,7 +62,7 @@ def test_get_configuration_from_normalized_path_scaling():
     assert idx == 2
 
 
-def test_path_shortcutting_noop():
+def test_path_shortcutting_noop() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
 
@@ -77,7 +77,7 @@ def test_path_shortcutting_noop():
     assert q_shortened == q_path
 
 
-def test_path_shortcutting():
+def test_path_shortcutting() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
 
