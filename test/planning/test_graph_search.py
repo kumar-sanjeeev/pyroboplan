@@ -2,7 +2,7 @@ from pyroboplan.planning.graph import Node, Graph
 from pyroboplan.planning.graph_search import astar, dfs
 
 
-def construct_square_graph(n):
+def construct_square_graph(n: int) -> Graph:
     """
     Creates a connected n x n square graph for testing.
 

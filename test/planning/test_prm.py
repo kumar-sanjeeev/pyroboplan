@@ -6,7 +6,7 @@ from pyroboplan.models.two_dof import (
 from pyroboplan.planning.prm import PRMPlanner, PRMPlannerOptions
 
 
-def construct_roadmap_test(options):
+def construct_roadmap_test(options: PRMPlannerOptions) -> PRMPlanner:
     # Initialize models, and construct and return a planner with the provided options
     model, collision_model, _ = load_models()
     planner = PRMPlanner(model, collision_model, options=options)

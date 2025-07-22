@@ -162,7 +162,7 @@ def test_traj_opt_empty_path() -> None:
     model, collision_model, _ = load_models()
 
     # Define an empty path
-    q_path = []
+    q_path: list[float] = []
 
     # Perform trajectory optimization
     options = CubicTrajectoryOptimizationOptions(

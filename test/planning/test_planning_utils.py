@@ -65,7 +65,7 @@ def test_retrace_path() -> None:
 
 
 class DummyModel:
-    def __init__(self, lower_limit, upper_limit):
+    def __init__(self, lower_limit: np.ndarray, upper_limit: np.ndarray):
         self.lowerPositionLimit = lower_limit
         self.upperPositionLimit = upper_limit
 

@@ -11,7 +11,7 @@ from pyroboplan.models.panda import load_models, add_self_collisions
 from pyroboplan.core.utils import get_random_state
 
 
-def test_zero_nullspace_component():
+def test_zero_nullspace_component() -> None:
     model, _, _ = load_models()
     q = get_random_state(model)
     component = zero_nullspace_component(model, q)
@@ -19,7 +19,7 @@ def test_zero_nullspace_component():
     assert np.all(component == 0.0)
 
 
-def test_joint_limit_nullspace_component():
+def test_joint_limit_nullspace_component() -> None:
     model, _, _ = load_models()
 
     # Nominal case
@@ -47,7 +47,7 @@ def test_joint_limit_nullspace_component():
     assert component[5] == pytest.approx(-0.55)
 
 
-def test_joint_center_nullspace_component():
+def test_joint_center_nullspace_component() -> None:
     model, _, _ = load_models()
 
     # Exactly centered case
@@ -66,7 +66,7 @@ def test_joint_center_nullspace_component():
     assert component[6] == pytest.approx(0.25)
 
 
-def test_collision_avoidance_nullpace_component():
+def test_collision_avoidance_nullpace_component() -> None:
     model, collision_model, _ = load_models()
     add_self_collisions(model, collision_model)
     data = model.createData()
