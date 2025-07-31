@@ -1,14 +1,16 @@
 """Implementations of graph search algorithms for planning applications."""
 
+from typing import Callable, Optional, List
 import numpy as np
 
 from heapq import heappop, heappush
 
 from pyroboplan.core.utils import configuration_distance
 from pyroboplan.planning.utils import retrace_path
+from pyroboplan.planning.graph import Graph, Node
 
 
-def dfs(graph, start_node, goal_node):
+def dfs(graph: Graph, start_node: Node, goal_node: Node) -> Optional[List[Node]]:
     """
     Find a path between the `start_pose` and `goal_pose` using a depth first search (DFS).
 
@@ -41,7 +43,8 @@ def dfs(graph, start_node, goal_node):
     while stack:
         current = stack.pop()
         if current == goal_node:
-            return retrace_path(current)
+            path: List[Node] = retrace_path(goal_node)
+            return path
 
         if current not in visited:
             visited.add(current)
@@ -58,11 +61,13 @@ def dfs(graph, start_node, goal_node):
 
 
 def astar(
-    graph,
-    start_node,
-    goal_node,
-    heuristic=lambda n1, n2: configuration_distance(n1.q, n2.q),
-):
+    graph: Graph,
+    start_node: Node,
+    goal_node: Node,
+    heuristic: Callable[[Node, Node], float] = lambda n1, n2: configuration_distance(
+        n1.q, n2.q
+    ),
+) -> Optional[List[Node]]:
     """
     Finds the shortest path between the start_pose and goal_pose using the A* algorithm.
 
@@ -94,7 +99,7 @@ def astar(
     # sort based on the first element. We use a counter as the second element to avoid
     # having to rely on node values for tie-breaking in pushes.
     open_set_nodes = set()  # For faster element lookup
-    open_set = []
+    open_set = []  # type: ignore
     counter = 0
     heappush(open_set, (0, counter, start_node))
     open_set_nodes.add(start_node)
@@ -110,7 +115,8 @@ def astar(
 
         # Then we're done
         if current == goal_node:
-            return retrace_path(goal_node)
+            path: List[Node] = retrace_path(goal_node)
+            return path
 
         for neighbor in current.neighbors:
             # If we haven't visited then the assumed cost is infinity

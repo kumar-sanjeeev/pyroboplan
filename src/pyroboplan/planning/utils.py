@@ -1,6 +1,10 @@
 """Utilities for motion planning."""
 
+from typing import Optional, List
 import numpy as np
+import pinocchio
+
+from pyroboplan.planning.graph import Node
 
 from ..core.utils import (
     check_collisions_at_state,
@@ -12,7 +16,9 @@ from ..core.utils import (
 from itertools import product
 
 
-def extend_robot_state(q_parent, q_sample, max_connection_distance):
+def extend_robot_state(
+    q_parent: np.ndarray, q_sample: np.ndarray, max_connection_distance: float
+) -> np.ndarray:
     """
     Determines an incremental robot configuration between the parent and sample states, if one exists.
 
@@ -49,15 +55,15 @@ def extend_robot_state(q_parent, q_sample, max_connection_distance):
 
 
 def has_collision_free_path(
-    q1,
-    q2,
-    max_step_size,
-    model,
-    collision_model,
-    data=None,
-    collision_data=None,
-    distance_padding=0.0,
-):
+    q1: np.ndarray,
+    q2: np.ndarray,
+    max_step_size: float,
+    model: pinocchio.Model,
+    collision_model: pinocchio.Model,
+    data: Optional[pinocchio.Data] = None,
+    collision_data: Optional[pinocchio.GeometryData] = None,
+    distance_padding: Optional[float] = 0.0,
+) -> bool:
     """
     Determines if there is a collision free path between the provided nodes and models.
 
@@ -111,7 +117,9 @@ def has_collision_free_path(
     return True
 
 
-def discretize_joint_space_path(q_path, max_angle_distance):
+def discretize_joint_space_path(
+    q_path: List[np.ndarray], max_angle_distance: float
+) -> List[np.ndarray]:
     """
     Discretizes a joint space path given a maximum angle distance between samples.
 
@@ -140,7 +148,7 @@ def discretize_joint_space_path(q_path, max_angle_distance):
     return q_discretized
 
 
-def retrace_path(goal_node):
+def retrace_path(goal_node: Node) -> List[Node]:
     """
     Retraces a path to the specified `goal_node` from a root node (a node with no parent).
 
@@ -167,7 +175,9 @@ def retrace_path(goal_node):
     return path
 
 
-def discretized_joint_space_generator(model, step_size, generate_random=True):
+def discretized_joint_space_generator(
+    model: pinocchio.Model, step_size: float, generate_random: bool = True
+) -> None:
     """
     Discretizes the entire joint space of the model at step_size increments.
     Once the entire space has been returned, the generator can optionally continue

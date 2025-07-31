@@ -1,5 +1,6 @@
 """Generic graph class for use in robot motion planning algorithms."""
 
+from typing import Optional, List, Tuple
 import numpy as np
 import ast
 import re
@@ -10,7 +11,12 @@ from ..core.utils import configuration_distance
 class Node:
     """Describes an individual node in a graph."""
 
-    def __init__(self, q, parent=None, cost=0.0):
+    def __init__(
+        self,
+        q: np.ndarray,
+        parent: Optional["Node"] = None,
+        cost: Optional[float] = 0.0,
+    ) -> None:
         """
         Creates a graph node instance.
 
@@ -28,26 +34,30 @@ class Node:
         self.cost = cost
 
         # Dictionary of neighboring nodes and their distances
-        self.neighbors = {}
+        self.neighbors = {}  # type: ignore
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Hash on joint configurations only."""
         return hash(self.q.tobytes())
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> np.bool_:
         """A node is equal to another node if and only if their joint configurations are equal."""
+        if not isinstance(other, Node):
+            return NotImplemented
         return np.array_equal(self.q, other.q)
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         """Compare nodes based on their lexicographical joint configurations."""
+        if not isinstance(other, Node):
+            return NotImplemented
         return tuple(self.q) < tuple(other.q)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the node that includes joint configuration and cost."""
         return f"Node(q={self.q.tolist()}, cost={self.cost})"
 
     @staticmethod
-    def parse(s):
+    def parse(s: str) -> "Node":
         """Reconstruct a Node object from its string representation."""
         pattern = r"Node\(q=(.*?), cost=(.*?)\)"
         match = re.match(pattern, s)
@@ -61,7 +71,7 @@ class Node:
 class Edge:
     """Describes an individual edge in a graph."""
 
-    def __init__(self, nodeA, nodeB, cost=0.0):
+    def __init__(self, nodeA: Node, nodeB: Node, cost: float = 0.0):
         """
         Creates a graph edge instance.
 
@@ -78,20 +88,22 @@ class Edge:
         self.nodeB = nodeB
         self.cost = cost
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Computes the hash of this edge using its nodes' hashes."""
         return hash((self.nodeA, self.nodeB))
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> np.bool_:
         """Two edges are equal if and only if they both start and end at the same nodes."""
+        if not isinstance(object, Edge):
+            return NotImplemented
         return self.nodeA == other.nodeA and self.nodeB == other.nodeB
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the edge."""
         return f"Edge(nodeA=({self.nodeA}), nodeB=({self.nodeB}), cost={self.cost})"
 
     @staticmethod
-    def parse(s):
+    def parse(s: str) -> "Edge":
         """Reconstruct an Edge object from its string representation."""
         pattern = r"Edge\(nodeA=\((.*?)\), nodeB=\((.*?)\), cost=(.*?)\)"
         match = re.match(pattern, s)
@@ -106,14 +118,14 @@ class Edge:
 class Graph:
     """Describes a graph of robot configuration states for motion planning."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Creates a graph instance with no edges or nodes.
         """
-        self.nodes = {}
-        self.edges = set()
+        self.nodes = {}  # type: ignore
+        self.edges = set()  # type: ignore
 
-    def add_node(self, node):
+    def add_node(self, node: Node) -> None:
         """
         Adds a node to the graph.
 
@@ -127,7 +139,7 @@ class Graph:
 
         self.nodes[node] = node
 
-    def get_node(self, q):
+    def get_node(self, q: np.ndarray) -> Node:
         """
         Returns the node corresponding to the provided robot configuration, or None if not present.
 
@@ -147,9 +159,9 @@ class Graph:
         if node not in self.nodes:
             raise ValueError("Specified robot configuration not found in Graph.")
 
-        return self.nodes[node]
+        return self.nodes[node]  # type: ignore
 
-    def remove_node(self, node):
+    def remove_node(self, node: Node) -> bool:
         """
         Removes a node from the graph, along with all of its corresponding edges.
 
@@ -173,7 +185,7 @@ class Graph:
         del self.nodes[node]
         return True
 
-    def add_edge(self, nodeA, nodeB):
+    def add_edge(self, nodeA: Node, nodeB: Node) -> Edge:
         """
         Adds an edge to the graph.
 
@@ -208,7 +220,7 @@ class Graph:
         nodeB.neighbors[nodeA] = cost
         return edge
 
-    def remove_edge(self, nodeA, nodeB):
+    def remove_edge(self, nodeA: Node, nodeB: Node) -> bool:
         """
         Attempts to remove an edge from a graph, if it exists.
 
@@ -238,7 +250,7 @@ class Graph:
         self.edges.remove(edge)
         return True
 
-    def get_nearest_node(self, q):
+    def get_nearest_node(self, q: np.ndarray) -> Optional[Node]:
         """
         Gets the nearest node to a specified robot configuration.
         If the configuration is in the graph the corresponding node will be returned. Namely,
@@ -258,7 +270,7 @@ class Graph:
         min_dist = np.inf
         chk_node = Node(q)
         if chk_node in self.nodes:
-            return self.nodes[chk_node]
+            return self.nodes[chk_node]  # type: ignore
 
         for node in self.nodes:
             dist = configuration_distance(q, node.q)
@@ -268,7 +280,9 @@ class Graph:
 
         return nearest_node
 
-    def get_nearest_neighbors(self, q, radius):
+    def get_nearest_neighbors(
+        self, q: np.ndarray, radius: float
+    ) -> List[Tuple[Node, float]]:
         """
         Gets a list of the nearest neighbors to the specified robot configuration.
 
@@ -300,7 +314,7 @@ class Graph:
         # Sort based on the second entry in the tuples, namely the distance from q.
         return sorted(neighbors, key=lambda n: n[1])
 
-    def save_to_file(self, filename):
+    def save_to_file(self, filename: str) -> None:
         """
         Write the graph to file.
 
@@ -316,7 +330,7 @@ class Graph:
             file.writelines([str(edge) + "\n" for edge in self.edges])
 
     @classmethod
-    def load_from_file(cls, filename):
+    def load_from_file(cls, filename: str) -> "Graph":
         """
         Loads a graph from a file.
 

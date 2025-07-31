@@ -1,9 +1,12 @@
 """Utilities for manipulation-specific Probabilistic Roadmaps (PRMs)."""
 
+from typing import Optional, Iterator, List
 import numpy as np
 import time
+import pinocchio
 
 from pyroboplan.planning.graph_search import astar
+from pyroboplan.planning.graph import Node
 
 from ..core.utils import (
     check_collisions_at_state,
@@ -16,7 +19,7 @@ from .graph import Node, Graph
 from .utils import discretize_joint_space_path, has_collision_free_path
 
 
-def random_model_state_generator(model):
+def random_model_state_generator(model: pinocchio.Model) -> Iterator[np.ndarray]:
     while True:
         yield get_random_state(model)
 
@@ -26,15 +29,15 @@ class PRMPlannerOptions:
 
     def __init__(
         self,
-        max_step_size=0.05,
-        max_neighbor_radius=0.5,
-        max_neighbor_connections=15,
-        max_construction_nodes=5000,
-        construction_timeout=10.0,
-        rng_seed=None,
-        prm_star=False,
-        prm_file=None,
-    ):
+        max_step_size: float = 0.05,
+        max_neighbor_radius: float = 0.5,
+        max_neighbor_connections: int = 15,
+        max_construction_nodes: int = 5000,
+        construction_timeout: float = 10.0,
+        rng_seed: Optional[int] = None,
+        prm_star: Optional[bool] = False,
+        prm_file: Optional[str] = None,
+    ) -> None:
         """
         Initializes a set of PRM planner options.
 
@@ -44,7 +47,7 @@ class PRMPlannerOptions:
                 Maximum joint configuration step size for collision checking along path segments.
             max_neighbor_radius : float
                 The maximum allowable connectable distance between nodes.
-            max_neighbor_connections : float
+            max_neighbor_connections : int
                 The maximum number of neighbors to check when adding a node to the roadmap.
             max_construction_nodes : int
                 The maximum number of samples to generate in the configuration space when growing the graph.
@@ -87,7 +90,12 @@ class PRMPlanner:
 
     """
 
-    def __init__(self, model, collision_model, options=PRMPlannerOptions()):
+    def __init__(
+        self,
+        model: pinocchio.Model,
+        collision_model: pinocchio.Model,
+        options: PRMPlannerOptions = PRMPlannerOptions(),
+    ) -> None:
         """
         Creates an instance of a PRM planner.
 
@@ -112,7 +120,9 @@ class PRMPlanner:
         else:
             self.graph = Graph.load_from_file(self.options.prm_file)
 
-    def construct_roadmap(self, sample_generator=None):
+    def construct_roadmap(
+        self, sample_generator: Optional[Iterator[np.ndarray]] = None
+    ) -> None:
         """
         Grows the graph by sampling nodes using the provided generator, then connecting
         them to the Graph. The caller can optionally override the default generator, if desired.
@@ -167,7 +177,7 @@ class PRMPlanner:
             self.connect_node(new_node, radius, max_neighbors)
             added_nodes += 1
 
-    def connect_node(self, new_node, radius, k):
+    def connect_node(self, new_node: Node, radius: float, k: int) -> bool:
         """
         Identifies all neighbors and makes connections to the added node.
 
@@ -204,7 +214,7 @@ class PRMPlanner:
 
         return success
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Resets the PRM's transient data between queries.
         """
@@ -213,7 +223,7 @@ class PRMPlanner:
             node.parent = None
             node.cost = None
 
-    def connect_planning_nodes(self, start_node, goal_node):
+    def connect_planning_nodes(self, start_node: Node, goal_node: Node) -> bool:
         """
         Ensures the start and goal configurations can be connected to the PRM.
 
@@ -249,7 +259,9 @@ class PRMPlanner:
 
         return success
 
-    def plan(self, q_start, q_goal):
+    def plan(
+        self, q_start: np.ndarray, q_goal: np.ndarray
+    ) -> Optional[List[np.ndarray]]:
         """
         Plans a path from a start to a goal configuration using the constructed graph.
 
@@ -293,7 +305,7 @@ class PRMPlanner:
 
             # Reconstruct the path if it exists
             path = [node.q for node in node_path] if node_path else None
-            self.latest_path = path
+            self.latest_path = path  # type: ignore
 
         # Always remove the start and end nodes from the PRM.
         self.graph.remove_node(start_node)
@@ -303,13 +315,13 @@ class PRMPlanner:
 
     def visualize(
         self,
-        visualizer,
-        frame_name,
-        path_name="planned_path",
-        graph_name="prm",
-        show_path=True,
-        show_graph=False,
-    ):
+        visualizer: pinocchio.visualize.meshcat_visualizer.MeshcatVisualizer,
+        frame_name: str,
+        path_name: Optional[str] = "planned_path",
+        graph_name: Optional[str] = "prm",
+        show_path: Optional[bool] = True,
+        show_graph: Optional[bool] = False,
+    ) -> None:
         """
         Visualizes the PRM and the latest path found within it.
 

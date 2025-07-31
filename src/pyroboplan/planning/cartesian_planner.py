@@ -1,5 +1,6 @@
 """Utilities for Cartesian (or task space) motion planning."""
 
+from typing import List, Any, Tuple
 import numpy as np
 import pinocchio
 from scipy.spatial.transform import Rotation, Slerp
@@ -12,12 +13,12 @@ class CartesianPlannerOptions:
 
     def __init__(
         self,
-        use_trapezoidal_scaling=True,
-        max_linear_velocity=1.0,
-        max_linear_acceleration=1.0,
-        max_angular_velocity=1.0,
-        max_angular_acceleration=1.0,
-    ):
+        use_trapezoidal_scaling: bool = True,
+        max_linear_velocity: float = 1.0,
+        max_linear_acceleration: float = 1.0,
+        max_angular_velocity: float = 1.0,
+        max_angular_acceleration: float = 1.0,
+    ) -> None:
         """
         Initializes a set of Cartesian planning options.
 
@@ -65,8 +66,13 @@ class CartesianPlanner:
     """
 
     def __init__(
-        self, model, target_frame, tforms, ik_solver, options=CartesianPlannerOptions()
-    ):
+        self,
+        model: pinocchio.Model,
+        target_frame: str,
+        tforms: List[pinocchio.SE3],
+        ik_solver: Any,
+        options: CartesianPlannerOptions = CartesianPlannerOptions(),
+    ) -> None:
         """
         Initializes a Cartesian motion planner instance.
 
@@ -145,7 +151,9 @@ class CartesianPlanner:
 
             cur_time = final_time
 
-    def generate(self, q_init, dt):
+    def generate(
+        self, q_init: np.ndarray, dt: float
+    ) -> Tuple[bool, np.ndarray, np.ndarray]:
         """
         Generates a set of joint trajectories from the Cartesian plan at a specified sample time.
 

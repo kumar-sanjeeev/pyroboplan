@@ -1,7 +1,10 @@
 """Utilities for manipulation-specific Rapidly-Exploring Random Trees (RRTs)."""
 
+from typing import Optional, List, Any
 import numpy as np
 import time
+
+import pinocchio
 
 from ..core.utils import (
     check_collisions_at_state,
@@ -26,18 +29,18 @@ class RRTPlannerOptions:
 
     def __init__(
         self,
-        max_step_size=0.05,
-        max_connection_dist=np.inf,
-        rrt_connect=False,
-        bidirectional_rrt=False,
-        rrt_star=False,
-        max_rewire_dist=np.inf,
-        max_planning_time=10.0,
-        rng_seed=None,
-        fast_return=True,
-        goal_biasing_probability=0.0,
-        collision_distance_padding=0.0,
-    ):
+        max_step_size: float = 0.05,
+        max_connection_dist: float = np.inf,
+        rrt_connect: bool = False,
+        bidirectional_rrt: bool = False,
+        rrt_star: bool = False,
+        max_rewire_dist: float = np.inf,
+        max_planning_time: float = 10.0,
+        rng_seed: Optional[int] = None,
+        fast_return: bool = True,
+        goal_biasing_probability: float = 0.0,
+        collision_distance_padding: float = 0.0,
+    ) -> None:
         """
         Initializes a set of RRT planner options.
 
@@ -95,7 +98,12 @@ class RRTPlanner:
       * RRT* and PRM* paper: https://arxiv.org/abs/1105.1186
     """
 
-    def __init__(self, model, collision_model, options=RRTPlannerOptions()):
+    def __init__(
+        self,
+        model: pinocchio.Model,
+        collision_model: pinocchio.Model,
+        options: RRTPlannerOptions = RRTPlannerOptions(),
+    ) -> None:
         """
         Creates an instance of an RRT planner.
 
@@ -115,14 +123,14 @@ class RRTPlanner:
         self.options = options
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         """Resets all the planning data structures."""
-        self.latest_path = None
+        self.latest_path: Any = None
         self.start_tree = Graph()
         self.goal_tree = Graph()
         np.random.seed(self.options.rng_seed)
 
-    def plan(self, q_start, q_goal):
+    def plan(self, q_start: np.ndarray, q_goal: np.ndarray) -> Any:
         """
         Plans a path from a start to a goal configuration.
 
@@ -132,6 +140,11 @@ class RRTPlanner:
                 The starting robot configuration.
             q_goal : array-like
                 The goal robot configuration.
+
+        Return
+        ------
+            Any
+                If found returns a list of robot configurations describing the path waypoints in order, otherwise None
         """
         self.reset()
         t_start = time.time()
@@ -210,7 +223,7 @@ class RRTPlanner:
 
             # Run the extend or connect operation to connect the tree to the new node.
             nearest_node = tree.get_nearest_node(q_sample)
-            new_node = self.extend_or_connect(tree, nearest_node, q_sample)
+            new_node = self.extend_or_connect(tree, nearest_node, q_sample)  # type: ignore
 
             # Only if extend/connect succeeded, add the new node to the tree.
             if new_node is not None:
@@ -223,13 +236,13 @@ class RRTPlanner:
                 # If so, add it to the tree and mark planning as complete.
                 nearest_node_in_other_tree = other_tree.get_nearest_node(new_node.q)
                 distance_to_other_tree = configuration_distance(
-                    new_node.q, nearest_node_in_other_tree.q
+                    new_node.q, nearest_node_in_other_tree.q  # type: ignore
                 )
                 if distance_to_other_tree <= self.options.max_connection_dist:
                     path_to_other_tree = discretize_joint_space_path(
-                        [new_node.q, nearest_node_in_other_tree.q],
+                        [new_node.q, nearest_node_in_other_tree.q],  # type: ignore
                         self.options.max_step_size,
-                    )
+                    )  # type: ignore
                     if not check_collisions_along_path(
                         self.model,
                         self.collision_model,
@@ -238,13 +251,13 @@ class RRTPlanner:
                     ):
                         if distance_to_other_tree > 0:
                             new_node = self.add_node_to_tree(
-                                tree, nearest_node_in_other_tree.q, new_node
+                                tree, nearest_node_in_other_tree.q, new_node  # type: ignore
                             )
                         if start_tree_phase:
                             latest_start_tree_node = new_node
-                            latest_goal_tree_node = nearest_node_in_other_tree
+                            latest_goal_tree_node = nearest_node_in_other_tree  # type: ignore
                         else:
-                            latest_start_tree_node = nearest_node_in_other_tree
+                            latest_start_tree_node = nearest_node_in_other_tree  # type: ignore
                             latest_goal_tree_node = new_node
                         goal_found = True
 
@@ -260,7 +273,9 @@ class RRTPlanner:
             )
         return self.latest_path
 
-    def extend_or_connect(self, tree, parent_node, q_sample):
+    def extend_or_connect(
+        self, tree: Graph, parent_node: Node, q_sample: np.ndarray
+    ) -> Optional[Node]:
         """
         Extends a tree towards a sampled node with steps no larger than the maximum connection distance.
 
@@ -317,7 +332,9 @@ class RRTPlanner:
 
         return cur_node
 
-    def extract_path_from_trees(self, start_tree_final_node, goal_tree_final_node):
+    def extract_path_from_trees(
+        self, start_tree_final_node: Node, goal_tree_final_node: Node
+    ) -> List[np.ndarray]:
         """
         Extracts the final path from the RRT trees
 
@@ -348,7 +365,9 @@ class RRTPlanner:
         # Convert to robot configuration states
         return [n.q for n in path]
 
-    def add_node_to_tree(self, tree, q_new, parent_node):
+    def add_node_to_tree(
+        self, tree: Graph, q_new: np.ndarray, parent_node: Node
+    ) -> Node:
         """
         Add a new node to the tree. If the RRT* algorithm is enabled, will also rewire.
 
@@ -370,7 +389,7 @@ class RRTPlanner:
         new_node = Node(q_new, parent=parent_node)
         tree.add_node(new_node)
         edge = tree.add_edge(parent_node, new_node)
-        new_node.cost = parent_node.cost + edge.cost
+        new_node.cost = parent_node.cost + edge.cost  # type: ignore
 
         # If RRT* is enable it, rewire that node in the tree.
         if self.options.rrt_star:
@@ -405,13 +424,13 @@ class RRTPlanner:
 
     def visualize(
         self,
-        visualizer,
-        frame_name,
-        path_name="planned_path",
-        tree_name="rrt",
-        show_path=True,
-        show_tree=False,
-    ):
+        visualizer: pinocchio.visualize.meshcat_visualizer.MeshcatVisualizer,
+        frame_name: str,
+        path_name: str = "planned_path",
+        tree_name: str = "rrt",
+        show_path: bool = True,
+        show_tree: bool = False,
+    ) -> None:
         """
         Visualizes the RRT path.
 
@@ -432,7 +451,7 @@ class RRTPlanner:
         """
         visualizer.viewer[path_name].delete()
         if show_path:
-            q_path = discretize_joint_space_path(
+            q_path = discretize_joint_space_path(  # type: ignore
                 self.latest_path, self.options.max_step_size
             )
 

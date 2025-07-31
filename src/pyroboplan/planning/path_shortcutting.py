@@ -1,6 +1,9 @@
 """Capabilities to shorten paths produced by motion planners."""
 
+from typing import List, Tuple
 import numpy as np
+
+from pinocchio import Model
 
 from pyroboplan.core.utils import configuration_distance, get_path_length
 from pyroboplan.planning.utils import (
@@ -9,9 +12,9 @@ from pyroboplan.planning.utils import (
 )
 
 
-def get_normalized_path_scaling(q_path):
+def get_normalized_path_scaling(q_path: List[np.ndarray]) -> np.ndarray:
     """
-    Returns a list of length-normalized scaling values along a joint configuration path,
+    Returns a list or numpy array of length-normalized scaling values along a joint configuration path,
     from 0.0 at the start to 1.0 at the end.
 
     Parameters
@@ -21,8 +24,11 @@ def get_normalized_path_scaling(q_path):
 
     Return
     ------
-        list[float]
+        Union[list[float], np.ndarray]
             The list of scaling values, between 0.0 and 1.0, at each of the path waypoints.
+            If the path is empty, returns an empty list.
+            If the path has only one point, returns a list with a single valze [1.0]
+            Otherwise, returns a numpy array
     """
     if len(q_path) == 0:
         return []
@@ -37,7 +43,9 @@ def get_normalized_path_scaling(q_path):
     return np.array(path_length_list) / path_length
 
 
-def get_configuration_from_normalized_path_scaling(q_path, path_scalings, value):
+def get_configuration_from_normalized_path_scaling(
+    q_path: List[np.ndarray], path_scalings: List[float], value: float
+) -> Tuple[np.ndarray, int]:
     """
     Given a path and its corresponding length-normalized scalings between 0.0 and 1.0,
     get the joint configuration at a specific scale value.
@@ -58,7 +66,7 @@ def get_configuration_from_normalized_path_scaling(q_path, path_scalings, value)
 
     Return
     ------
-        tuple (array-like, int)
+        tuple [array-like, int]
             A tuple containing the joint configuration at the specified scaling value along the path,
             as well as the index corresponding to the next point along the path.
     """
@@ -75,7 +83,13 @@ def get_configuration_from_normalized_path_scaling(q_path, path_scalings, value)
         return q_path[idx - 1] + delta_scale * (q_path[idx] - q_path[idx - 1]), idx
 
 
-def shortcut_path(model, collision_model, q_path, max_iters=100, max_step_size=0.05):
+def shortcut_path(
+    model: Model,
+    collision_model: Model,
+    q_path: List[np.ndarray],
+    max_iters: int = 100,
+    max_step_size: float = 0.05,
+) -> List[np.ndarray]:
     """
     Performs path shortcutting by sampling two random points along the path and verifying
     whether those two points can be connected directly without collisions.
