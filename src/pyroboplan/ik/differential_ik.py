@@ -1,5 +1,6 @@
 """Utilities for differential IK."""
 
+from typing import Optional, List, Callable
 import numpy as np
 import pinocchio
 import time
@@ -21,17 +22,17 @@ class DifferentialIkOptions:
 
     def __init__(
         self,
-        max_iters=200,
-        max_retries=10,
-        max_translation_error=1e-3,
-        max_rotation_error=1e-3,
-        damping=1e-3,
-        min_step_size=0.1,
-        max_step_size=0.5,
-        ignore_joint_indices=[],
-        joint_weights=None,
-        rng_seed=None,
-    ):
+        max_iters: int = 200,
+        max_retries: int = 10,
+        max_translation_error: float = 1e-3,
+        max_rotation_error: float = 1e-3,
+        damping: float = 1e-3,
+        min_step_size: float = 0.1,
+        max_step_size: float = 0.5,
+        joint_weights: Optional[List[float]] = None,
+        ignore_joint_indices: Optional[List[int]] = [],
+        rng_seed: Optional[int] = None,
+    ) -> None:
         """
         Initializes a set of differential IK options.
 
@@ -93,13 +94,15 @@ class DifferentialIk:
 
     def __init__(
         self,
-        model,
-        collision_model=None,
-        data=None,
-        collision_data=None,
-        visualizer=None,
-        options=DifferentialIkOptions(),
-    ):
+        model: pinocchio.Model,
+        collision_model: Optional[pinocchio.Model] = None,
+        data: Optional[pinocchio.Data] = None,
+        collision_data: Optional[pinocchio.GeometryData] = None,
+        visualizer: Optional[
+            pinocchio.visualize.meshcat_visualizer.MeshcatVisualizer
+        ] = None,
+        options: DifferentialIkOptions = DifferentialIkOptions(),
+    ) -> None:
         """
         Creates an instance of a DifferentialIk solver.
 
@@ -125,7 +128,7 @@ class DifferentialIk:
             data = model.createData()
         self.data = data
         if not collision_data and self.collision_model is not None:
-            collision_data = collision_model.createData()
+            collision_data = collision_model.createData()  # type: ignore
         self.collision_data = collision_data
 
         self.visualizer = visualizer
@@ -133,12 +136,14 @@ class DifferentialIk:
 
     def solve(
         self,
-        target_frame,
-        target_tform,
-        init_state=None,
-        nullspace_components=[],
-        verbose=False,
-    ):
+        target_frame: str,
+        target_tform: pinocchio.SE3,
+        init_state: Optional[np.ndarray] = None,
+        nullspace_components: Optional[
+            List[Callable[[pinocchio.Model, np.ndarray], np.ndarray]]
+        ] = [],
+        verbose: bool = False,
+    ) -> Optional[np.ndarray]:
         """
         Solves an IK query.
 
@@ -168,7 +173,7 @@ class DifferentialIk:
         active_joint_indices = [
             idx
             for idx in range(self.model.nq)
-            if idx not in self.options.ignore_joint_indices
+            if idx not in self.options.ignore_joint_indices  # type: ignore
         ]
         num_active_joints = len(active_joint_indices)
 

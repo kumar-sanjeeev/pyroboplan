@@ -6,7 +6,7 @@ import pinocchio
 from pyroboplan.core.utils import calculate_collision_vector_and_jacobians
 
 
-def zero_nullspace_component(model, q):
+def zero_nullspace_component(model: pinocchio.Model, q: np.ndarray) -> np.ndarray:
     """
     Returns a zero nullspace component, which is effectively a no-op.
 
@@ -25,7 +25,9 @@ def zero_nullspace_component(model, q):
     return np.zeros_like(model.lowerPositionLimit)
 
 
-def joint_limit_nullspace_component(model, q, gain=1.0, padding=0.0):
+def joint_limit_nullspace_component(
+    model: pinocchio.Model, q: np.ndarray, gain: float = 1.0, padding: float = 0.0
+) -> np.ndarray:
     """
     Returns a joint limits avoidance nullspace component.
 
@@ -57,7 +59,9 @@ def joint_limit_nullspace_component(model, q, gain=1.0, padding=0.0):
     return grad
 
 
-def joint_center_nullspace_component(model, q, gain=1.0):
+def joint_center_nullspace_component(
+    model: pinocchio.Model, q: np.ndarray, gain: float = 1.0
+) -> np.ndarray:
     """
     Returns a joint centering nullspace component.
 
@@ -80,14 +84,14 @@ def joint_center_nullspace_component(model, q, gain=1.0):
 
 
 def collision_avoidance_nullspace_component(
-    model,
-    data,
-    collision_model,
-    collision_data,
-    q,
-    dist_padding=0.05,
-    gain=1.0,
-):
+    model: pinocchio.Model,
+    data: pinocchio.Data,
+    collision_model: pinocchio.GeometryModel,
+    collision_data: pinocchio.GeometryData,
+    q: np.ndarray,
+    dist_padding: float = 0.05,
+    gain: float = 1.0,
+) -> np.ndarray:
     """
     Returns a collision avoidance nullspace component.
 
