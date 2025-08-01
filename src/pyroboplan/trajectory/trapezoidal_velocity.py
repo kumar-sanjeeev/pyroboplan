@@ -1,3 +1,4 @@
+from typing import Union, Tuple, Optional, List
 import numpy as np
 import warnings
 
@@ -9,11 +10,11 @@ class TrapezoidalVelocityTrajectorySingleDofContainer:
     This class should not be used standalone.
     """
 
-    def __init__(self):
-        self.times = []
-        self.positions = []
-        self.velocities = []
-        self.accelerations = []
+    def __init__(self) -> None:
+        self.times = []  # type: ignore
+        self.positions = []  # type: ignore
+        self.velocities = []  # type: ignore
+        self.accelerations = []  # type: ignore
 
 
 class TrapezoidalVelocityTrajectory:
@@ -25,7 +26,13 @@ class TrapezoidalVelocityTrajectory:
       * MATLAB documentation: https://www.mathworks.com/help/robotics/ref/trapveltraj.html
     """
 
-    def __init__(self, q, qd_max, qdd_max, t_start=0.0):
+    def __init__(
+        self,
+        q: np.ndarray,
+        qd_max: Union[float, np.ndarray],
+        qdd_max: Union[float, np.ndarray],
+        t_start: float = 0.0,
+    ) -> None:
         """
         Creates a trapezoidal velocity profile trajectory.
 
@@ -186,7 +193,13 @@ class TrapezoidalVelocityTrajectory:
 
             self.segment_times.append(t_prev + t_segment)
 
-    def evaluate(self, t):
+    def evaluate(
+        self, t: float
+    ) -> Optional[
+        Tuple[
+            Union[float, np.ndarray], Union[float, np.ndarray], Union[float, np.ndarray]
+        ]
+    ]:
         """
         Evaluates the trajectory at a specific time.
 
@@ -243,7 +256,9 @@ class TrapezoidalVelocityTrajectory:
             qdd = qdd[0]
         return (q, qd, qdd)
 
-    def generate(self, dt):
+    def generate(
+        self, dt: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Generates a full trajectory at a specified sample time.
 
@@ -302,12 +317,12 @@ class TrapezoidalVelocityTrajectory:
 
     def visualize(
         self,
-        dt=0.01,
-        joint_names=None,
-        show_position=True,
-        show_velocity=False,
-        show_acceleration=False,
-    ):
+        dt: float = 0.01,
+        joint_names: Optional[List[str]] = None,
+        show_position: bool = True,
+        show_velocity: bool = False,
+        show_acceleration: bool = False,
+    ) -> None:
         """
         Visualizes a generated trajectory with one figure window per dimension.
 

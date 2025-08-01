@@ -1,11 +1,17 @@
 """Utilities for trajectory optimization based planning."""
 
+from typing import Union, Optional, List, Any
 from functools import partial
 import numpy as np
 import warnings
 
 import pinocchio
-from pydrake.autodiffutils import InitializeAutoDiff, ExtractGradient, ExtractValue
+from pydrake.autodiffutils import (
+    InitializeAutoDiff,
+    ExtractGradient,
+    ExtractValue,
+    AutoDiffXd,
+)
 from pydrake.solvers import (
     MathematicalProgram,
     QuadraticConstraint,
@@ -26,23 +32,23 @@ class CubicTrajectoryOptimizationOptions:
 
     def __init__(
         self,
-        num_waypoints=3,
-        samples_per_segment=11,
-        min_segment_time=0.01,
-        max_segment_time=10.0,
-        min_vel=-np.inf,
-        max_vel=np.inf,
-        min_accel=-np.inf,
-        max_accel=np.inf,
-        min_jerk=-np.inf,
-        max_jerk=np.inf,
-        max_planning_time=30.0,
-        check_collisions=False,
-        collision_link_list=[],
-        min_collision_dist=0.0,
-        collision_influence_dist=0.1,
-        collision_avoidance_cost_weight=0.0,
-    ):
+        num_waypoints: int = 3,
+        samples_per_segment: int = 11,
+        min_segment_time: float = 0.01,
+        max_segment_time: float = 10.0,
+        min_vel: Union[np.ndarray, float] = -np.inf,
+        max_vel: Union[np.ndarray, float] = np.inf,
+        min_accel: Union[np.ndarray, float] = -np.inf,
+        max_accel: Union[np.ndarray, float] = np.inf,
+        min_jerk: Union[np.ndarray, float] = -np.inf,
+        max_jerk: Union[np.ndarray, float] = np.inf,
+        max_planning_time: float = 30.0,
+        check_collisions: bool = False,
+        collision_link_list: List[str] = [],
+        min_collision_dist: float = 0.0,
+        collision_influence_dist: float = 0.1,
+        collision_avoidance_cost_weight: float = 0.0,
+    ) -> None:
         """
         Initializes a set of options for cubic polynomial trajectory optimization.
 
@@ -127,8 +133,11 @@ class CubicTrajectoryOptimization:
     """
 
     def __init__(
-        self, model, collision_model, options=CubicTrajectoryOptimizationOptions()
-    ):
+        self,
+        model: pinocchio.Model,
+        collision_model: pinocchio.GeometryModel,
+        options: CubicTrajectoryOptimizationOptions = CubicTrajectoryOptimizationOptions(),
+    ) -> None:
         """
         Creates an instance of a cubic trajectory optimization planner.
 
@@ -147,7 +156,7 @@ class CubicTrajectoryOptimization:
         self.collision_data = self.collision_model.createData()
         self.options = options
 
-    def _process_limits(self, limits, num_dofs, name):
+    def _process_limits(self, limits: Any, num_dofs: int, name: str) -> np.ndarray:
         """
         Helper function to process kinematics limits options.
 
@@ -176,7 +185,16 @@ class CubicTrajectoryOptimization:
             raise ValueError(f"{name} vector must have shape ({num_dofs},)")
         return limits
 
-    def _eval_position(self, x, x_d, xc_d, h, k, n, step):
+    def _eval_position(
+        self,
+        x: AutoDiffXd,
+        x_d: AutoDiffXd,
+        xc_d: AutoDiffXd,
+        h: AutoDiffXd,
+        k: int,
+        n: int,
+        step: float,
+    ) -> AutoDiffXd:
         """
         Helper function to symbolically evaluate a trajectory position.
 
@@ -217,7 +235,15 @@ class CubicTrajectoryOptimization:
             / h[k] ** 2
         )
 
-    def _eval_velocity(self, x_d, xc_d, h, k, n, step):
+    def _eval_velocity(
+        self,
+        x_d: AutoDiffXd,
+        xc_d: AutoDiffXd,
+        h: AutoDiffXd,
+        k: int,
+        n: int,
+        step: float,
+    ) -> AutoDiffXd:
         """
         Helper function to symbolically evaluate a trajectory velocity.
 
@@ -254,7 +280,15 @@ class CubicTrajectoryOptimization:
             / h[k] ** 2
         )
 
-    def _eval_acceleration(self, x_d, xc_d, h, k, n, step):
+    def _eval_acceleration(
+        self,
+        x_d: AutoDiffXd,
+        xc_d: AutoDiffXd,
+        h: AutoDiffXd,
+        k: int,
+        n: int,
+        step: float,
+    ) -> AutoDiffXd:
         """
         Helper function to symbolically evaluate a trajectory acceleration.
 
@@ -284,7 +318,15 @@ class CubicTrajectoryOptimization:
             x_d[k, n] - 2.0 * xc_d[k, n] + x_d[k + 1, n]
         ) * (step * h[k]) / h[k] ** 2
 
-    def _eval_jerk(self, x_d, xc_d, h, k, n, step):
+    def _eval_jerk(
+        self,
+        x_d: AutoDiffXd,
+        xc_d: AutoDiffXd,
+        h: AutoDiffXd,
+        k: int,
+        n: int,
+        step: float,
+    ) -> AutoDiffXd:
         """
         Helper function to symbolically evaluate a trajectory jerk.
 
@@ -312,7 +354,7 @@ class CubicTrajectoryOptimization:
         """
         return 8.0 * (x_d[k, n] - 2.0 * xc_d[k, n] + x_d[k + 1, n]) / h[k] ** 2
 
-    def _total_time_cost(self, h, weight=1.0):
+    def _total_time_cost(self, h: AutoDiffXd, weight: float = 1.0) -> AutoDiffXd:
         """
         Helper function that sets a quadratic cost on the total trajectory time.
 
@@ -335,14 +377,14 @@ class CubicTrajectoryOptimization:
 
     def _collision_constraint(
         self,
-        vars,
-        num_waypoints,
-        num_dofs,
-        samples_per_segment,
-        collision_pairs,
-        min_allowable_dist,
-        influence_dist,
-    ):
+        vars: AutoDiffXd,
+        num_waypoints: int,
+        num_dofs: int,
+        samples_per_segment: int,
+        collision_pairs: List[int],
+        min_allowable_dist: float,
+        influence_dist: float,
+    ) -> AutoDiffXd:
         """
         Helper function to evaluate collision constraint and its gradients.
 
@@ -473,7 +515,9 @@ class CubicTrajectoryOptimization:
             min_distance_smoothed_squared, gradient @ all_gradients
         )
 
-    def plan(self, q_path, init_path=None):
+    def plan(
+        self, q_path: List[np.ndarray], init_path: Optional[List[np.ndarray]] = None
+    ) -> Optional[CubicPolynomialTrajectory]:
         """
         Plans a trajectory from a start to a goal configuration, or along an entire trajectory.
 

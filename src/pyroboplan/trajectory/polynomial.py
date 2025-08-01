@@ -6,6 +6,7 @@ Some good resources:
   * Chapter 9 of this book: https://hades.mech.northwestern.edu/images/7/7f/MR.pdf
 """
 
+from typing import Tuple, Optional, Union
 from abc import ABC
 import numpy as np
 import warnings
@@ -14,7 +15,9 @@ import warnings
 class PolynomialTrajectoryBase(ABC):
     """Abstract base class for polynomial trajectories."""
 
-    def evaluate(self, t):
+    def evaluate(
+        self, t: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Evaluates the trajectory at a specific time.
 
@@ -67,7 +70,9 @@ class PolynomialTrajectoryBase(ABC):
             qddd = qddd[0]
         return q, qd, qdd, qddd
 
-    def generate(self, dt):
+    def generate(
+        self, dt: float
+    ) -> Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Generates a full trajectory at a specified sample time.
 
@@ -119,13 +124,13 @@ class PolynomialTrajectoryBase(ABC):
 
     def visualize(
         self,
-        dt=0.01,
-        joint_names=None,
-        show_position=True,
-        show_velocity=False,
-        show_acceleration=False,
-        show_jerk=False,
-    ):
+        dt: float = 0.01,
+        joint_names: Optional[str] = None,
+        show_position: bool = True,
+        show_velocity: bool = False,
+        show_acceleration: bool = False,
+        show_jerk: bool = False,
+    ) -> None:
         """
         Visualizes a generated trajectory with one figure window per dimension.
 
@@ -206,7 +211,7 @@ class PolynomialTrajectoryBase(ABC):
 class CubicPolynomialTrajectory(PolynomialTrajectoryBase):
     """Describes a cubic (3rd-order) polynomial trajectory."""
 
-    def __init__(self, t, q, qd=0.0):
+    def __init__(self, t: np.ndarray, q: np.ndarray, qd: np.ndarray = 0.0) -> None:
         """
         Creates a cubic (3rd-order) polynomial trajectory.
 
@@ -271,7 +276,13 @@ class CubicPolynomialTrajectory(PolynomialTrajectoryBase):
 class QuinticPolynomialTrajectory(PolynomialTrajectoryBase):
     """Describes a quintic (5th-order) polynomial trajectory."""
 
-    def __init__(self, t, q, qd=0.0, qdd=0.0):
+    def __init__(
+        self,
+        t: float,
+        q: np.ndarray,
+        qd: Union[np.ndarray, float] = 0.0,
+        qdd: Union[np.ndarray, float] = 0.0,
+    ) -> None:
         """
         Creates a quintic (5th-order) polynomial trajectory.
 
