@@ -1,12 +1,13 @@
 """Utilities to load example Universal Robots UR10 robot models."""
 
+from typing import Optional
 import os
 import pinocchio
 
 from .utils import get_example_models_folder
 
 
-def load_ur10_on_base_models():
+def load_ur10_on_base_models() -> pinocchio.Model:
     """
     Gets the example UR10 on base models.
 
@@ -22,7 +23,11 @@ def load_ur10_on_base_models():
     return pinocchio.buildModelsFromUrdf(urdf_filename, package_dirs=models_folder)
 
 
-def add_ur10_on_base_self_collisions(model, collision_model, srdf_filename=None):
+def add_ur10_on_base_self_collisions(
+    model: pinocchio.Model,
+    collision_model: pinocchio.Model,
+    srdf_filename: Optional[str] = None,
+) -> None:
     """
     Adds link self-collisions to the UR10 collision model.
 

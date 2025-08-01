@@ -4,7 +4,7 @@ import importlib.resources
 import pyroboplan
 
 
-def get_example_models_folder():
+def get_example_models_folder() -> str:
     """
     Returns the full path the example models folder.
 

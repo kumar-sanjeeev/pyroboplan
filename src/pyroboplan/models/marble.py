@@ -9,7 +9,7 @@ from ..core.utils import set_collisions
 from .utils import get_example_models_folder
 
 
-def load_models():
+def load_models() -> pinocchio.Model:
     """
     Gets the example 2-DOF models.
 
@@ -25,7 +25,11 @@ def load_models():
     return pinocchio.buildModelsFromUrdf(urdf_filename, package_dirs=models_folder)
 
 
-def add_object_collisions(model, collision_model, visual_model):
+def add_object_collisions(
+    model: pinocchio.Model,
+    collision_model: pinocchio.Model,
+    visual_model: pinocchio.Model,
+) -> None:
     ground_plane = pinocchio.GeometryObject(
         "ground",
         0,
@@ -38,7 +42,7 @@ def add_object_collisions(model, collision_model, visual_model):
 
     box_idx = 0
 
-    def box_on_plane(x, y, w, h):
+    def box_on_plane(x: float, y: float, w: float, h: float) -> None:
         nonlocal box_idx
         box_idx += 1
         box = pinocchio.GeometryObject(

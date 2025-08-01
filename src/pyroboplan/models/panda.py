@@ -1,5 +1,6 @@
 """Utilities to load example Franka Emika Panda model."""
 
+from typing import Optional
 import coal
 import numpy as np
 import os
@@ -10,7 +11,7 @@ from ..core.utils import set_collisions
 from .utils import get_example_models_folder
 
 
-def load_models(use_sphere_collisions=False):
+def load_models(use_sphere_collisions: bool = False) -> pinocchio.Model:
     """
     Gets the example Panda models.
 
@@ -27,7 +28,9 @@ def load_models(use_sphere_collisions=False):
     return pinocchio.buildModelsFromUrdf(urdf_filepath, package_dirs=models_folder)
 
 
-def load_point_cloud(pointcloud_path=None, voxel_resolution=0.04):
+def load_point_cloud(
+    pointcloud_path: Optional[str] = None, voxel_resolution: float = 0.04
+) -> coal.Octree:
     """
     Loads a point cloud from a PLY file and converts it into an octree structure.
 
@@ -54,7 +57,11 @@ def load_point_cloud(pointcloud_path=None, voxel_resolution=0.04):
     return octree
 
 
-def add_self_collisions(model, collision_model, srdf_filename=None):
+def add_self_collisions(
+    model: pinocchio.Model,
+    collision_model: pinocchio.Model,
+    srdf_filename: Optional[str] = None,
+) -> None:
     """
     Adds link self-collisions to the Panda collision model.
 
@@ -79,7 +86,12 @@ def add_self_collisions(model, collision_model, srdf_filename=None):
     pinocchio.removeCollisionPairs(model, collision_model, srdf_filename)
 
 
-def add_object_collisions(model, collision_model, visual_model, inflation_radius=0.0):
+def add_object_collisions(
+    model: pinocchio.Model,
+    collision_model: pinocchio.Model,
+    visual_model: pinocchio.Model,
+    inflation_radius: float = 0.0,
+) -> None:
     """
     Adds obstacles and collisions to the Panda collision model.
 
@@ -172,7 +184,12 @@ def add_object_collisions(model, collision_model, visual_model, inflation_radius
     set_collisions(model, collision_model, "panda_link0", "ground_plane", False)
 
 
-def add_octree_collisions(model, collision_model, visual_model, octree):
+def add_octree_collisions(
+    model: pinocchio.Model,
+    collision_model: pinocchio.Model,
+    visual_model: pinocchio.Model,
+    octree: coal.Octree,
+) -> None:
     """
     Adds an octree as a collision/visual object to the robot model and enables collisions
     between the octree and specified robot links.
