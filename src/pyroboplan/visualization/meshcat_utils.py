@@ -1,8 +1,12 @@
 """Utilities for visualization using MeshCat."""
 
+from typing import Optional, List
+
 import meshcat.geometry as mg
 import numpy as np
 
+from pinocchio.visualize.meshcat_visualizer import MeshcatVisualizer
+from pinocchio import SE3
 
 FRAME_AXIS_POSITIONS = (
     np.array([[0, 0, 0], [1, 0, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 0, 1]])
@@ -17,8 +21,13 @@ FRAME_AXIS_COLORS = (
 
 
 def visualize_frame(
-    visualizer, name, tform, line_length=0.2, line_width=3, line_color=None
-):
+    visualizer: MeshcatVisualizer,
+    name: str,
+    tform: SE3,
+    line_length: float = 0.2,
+    line_width: float = 3,
+    line_color: Optional[np.ndarray] = None,
+) -> None:
     """
     Visualizes a coordinate frame as an axis triad at a specified pose.
 
@@ -37,7 +46,7 @@ def visualize_frame(
         line_color : array-like, optional
             The line colors to use. If None, chooses default axes colors.
     """
-    if line_color:
+    if line_color is not None:
         color = np.array([line_color] * 6).T
     else:
         color = FRAME_AXIS_COLORS
@@ -58,8 +67,13 @@ def visualize_frame(
 
 
 def visualize_frames(
-    visualizer, prefix_name, tforms, line_length=0.2, line_width=3, line_color=None
-):
+    visualizer: MeshcatVisualizer,
+    prefix_name: str,
+    tforms: List[SE3],
+    line_length: float = 0.2,
+    line_width: float = 3,
+    line_color: Optional[np.ndarray] = None,
+) -> None:
     """
     Visualizes a set of coordinate frames as axis triads at specified poses.
 
@@ -90,7 +104,13 @@ def visualize_frames(
         )
 
 
-def visualize_path(visualizer, name, tforms, line_width=3, line_color=[0.0, 0.0, 0.0]):
+def visualize_path(
+    visualizer: MeshcatVisualizer,
+    name: str,
+    tforms: List[SE3],
+    line_width: float = 3,
+    line_color: Optional[np.ndarray] = [0.0, 0.0, 0.0],
+) -> None:
     """
     Visualizes a path of poses as lines containing only the translation component.
 
@@ -112,7 +132,13 @@ def visualize_path(visualizer, name, tforms, line_width=3, line_color=[0.0, 0.0,
     )
 
 
-def visualize_paths(visualizer, name, paths, line_width=3, line_color=[0.0, 0.0, 0.0]):
+def visualize_paths(
+    visualizer: MeshcatVisualizer,
+    name: str,
+    paths: List[List[SE3]],
+    line_width: float = 3,
+    line_color: Optional[np.ndarray] = [0.0, 0.0, 0.0],
+) -> None:
     """
     Visualizes a list of paths of poses as lines containing only the translation component.
 
